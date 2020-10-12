@@ -4,6 +4,7 @@ $(function() {
 
       var send_data;
       send_data = {
+          returnOrigin : document.getElementById('id_returnOrigin').value,
           attr : document.getElementById('id_attr').value, //$('input').val()
           attr_val : document.getElementById('id_attr_val').value
       };

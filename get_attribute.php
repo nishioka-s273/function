@@ -15,12 +15,16 @@
         <h2>WebAPI</h2>
         <h3>リクエスト</h3>
         <pre><?php
+            $returnOrigin = 'idp1.local';
             $attr = array('att1', 'att2', 'att3');
             $attr_val = array('val1', 'val2', 'val3');
+            $imp_returnOrigin = htmlspecialchars($returnOrigin);
             $imp_attr = htmlspecialchars(implode(',', $attr));
             $imp_val = htmlspecialchars(implode(',', $attr_val));
         ?></pre>
-        <input type="hidden" name="attr" id="id_attr" value="<?=$imp_attr?>"><!--- api.jsのsend_dataに反映させる-->
+        <!--- api.jsのsend_dataに反映させる-->
+        <input type="hidden" name="returnOrigin" id="id_returnOrigin" value="<?=$imp_returnOrigin?>">
+        <input type="hidden" name="attr" id="id_attr" value="<?=$imp_attr?>">
         <input type="hidden" name="attr_val" id="id_attr_val" value="<?=$imp_val?>">
         <!--ul>
             <li>a:Admin</li>
