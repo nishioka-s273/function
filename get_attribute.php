@@ -1,3 +1,45 @@
+<?php
+function get_attribute($server_name) {
+    // IPアドレスで書かないとエラーになる
+    $url = "http://10.229.71.229/api/attribute.php?"
+    ."returnOrigin=".$server_name;
+
+    
+    $option = [
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT => 3,
+    ];
+
+    $ch = curl_init($url);
+    curl_setopt_array($ch, $option);
+    
+    $json = curl_exec($ch);
+    $info = curl_getinfo($ch);
+    $errorNo = curl_errno($ch);
+
+    curl_close($ch);
+
+    if ($errorNo !== CURLE_OK) {
+        return "CURL ERROR : ".$errorNo;
+    }
+
+    if ($info['http_code'] !== 200) {
+        return "HTTP ERROR : ".$info['http_code'];
+    }
+
+    $jsonArray = json_decode($json, true);
+    if(count($jsonArray) === 0) {
+        echo "CAUGHT ARRAY IS NULL";
+    }
+
+    $ret = [];
+    $ret['result'] = $jsonArray['result'];
+    $ret['attributes'] = $jsonArray['attributes'];
+    $ret['key'] = $jsonArray['key'];
+
+    return $ret;
+}
+?>
 <!DOCTYPE html>
 <html lang="ja">
     <head>
@@ -14,29 +56,28 @@
     <body>
         <h2>WebAPI</h2>
         <h3>リクエスト</h3>
-        <pre><?php
-            $returnOrigin = 'idp1.local';
-            $attr = array('att1', 'att2', 'att3');
-            $attr_val = array('val1', 'val2', 'val3');
-            $imp_returnOrigin = htmlspecialchars($returnOrigin);
-            $imp_attr = htmlspecialchars(implode(',', $attr));
-            $imp_val = htmlspecialchars(implode(',', $attr_val));
-        ?></pre>
+        <?php 
+        $ats = get_attribute("idp1.local");
+        echo "result : ".$ats['result']."<br>attributes : ";
+        foreach ($ats['attributes'] as $atr) {
+            echo $atr." ";
+        }
+        echo "<br>key : ".$ats['key'];
+        ?>
+        <!--
+        <pre>
+        <!--<?php
+            //$returnOrigin = 'idp1.local';
+            //$imp_returnOrigin = htmlspecialchars($returnOrigin);
+        ?>
+        --></pre>
         <!--- api.jsのsend_dataに反映させる-->
-        <input type="hidden" name="returnOrigin" id="id_returnOrigin" value="<?=$imp_returnOrigin?>">
-        <input type="hidden" name="attr" id="id_attr" value="<?=$imp_attr?>">
-        <input type="hidden" name="attr_val" id="id_attr_val" value="<?=$imp_val?>">
-        <!--ul>
-            <li>a:Admin</li>
-            <li>o:Operatot</li>
-            <li>g:Guest</li>
-            <li>e::Empty</li>
-        </ul-->
+        <!--<input type="hidden" name="returnOrigin" id="id_returnOrigin" value="<?//=$imp_returnOrigin?>">
         <button data-btn-type="ajax">Data get!</button>
         <br><br>
         <h3>結果</h3>
         <div data-result="">未取得</div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-        <script type="text/javascript" src="api.js"></script>
+        <script type="text/javascript" src="api.js"></script>-->
     </body>
 </html>
