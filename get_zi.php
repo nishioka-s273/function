@@ -1,24 +1,31 @@
 <?php
 require "crypt.php";
+include("data/db_login.php");
 
 // 財産比べプロトコルで用いる z_i を作成し，SP に渡して w_{ij} を得る
-function get_zi ($attrs, $key, $rand, $server_name) {
-    echo "<br>";
-    print_r($key);
-    $i = 0;
-    foreach ($attrs as $atr){
-        echo "<br>".$atr;
-
-        // $atr の属性値を DB から取ってくる (とりあえずランダム整数で対処)
-        $z[$i] = rand(1, 10);
-        echo "<br> att".$i." = ".$z[$i];
-        $enc_r = encrypt($key['r'], $rand[$i], $key['Y'], $key['a'], $key['b'], $key['p']);
-        echo "<br> enc(r_".$i.") = ".$enc_r;
-        $z[$i] = $enc_r - $z[$i];
-        echo "<br> z_".$i." = ".$z[$i];
-        $i = $i+1;
+function get_zi ($attrs, $key, $rand, $server_name, $session_id, $uid) {
+    $connection = mysqli_connect($db_host, 'root', 'admin', 'simplesaml');
+    if (!$connection){
+        die ("[error1] Could not connect to the database: <br />". mysqli_connect_error());
     }
 
+    $z = [];
+    $i = 0;
+    foreach ($attrs as $atr){
+        // $atr の属性値を DB から取ってくる
+        $query = "SELECT $atr FROM users WHERE uid = '$uid'";
+        $result = mysqli_query($connection, $query);
+        if(!$result) {
+            die ("[error2] Could not query the database: <br />".mysqli_error());
+        }
+        else {
+            $result_row = mysqli_fetch_row($result);
+            $at_value = $result_row[0];
+            $enc_r = encrypt($key['r'], $rand[$i], $key['Y'], $key['a'], $key['b'], $key['p']);
+            $z[$i] = $enc_r - $at_value;
+            $i = $i+1;
+        }
+    }
     $url = "http://10.229.71.229/api/cal_wij.php?"
     ."returnOrigin=".$server_name
     ."&z=[";
@@ -26,11 +33,12 @@ function get_zi ($attrs, $key, $rand, $server_name) {
         $url = $url.$zi.",";
     }
     $url = substr($url, 0, -1);
-    $url = $url."]";
+    $url = $url."]&session_id=".$session_id;
 
     $option = [
         CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT => 3,
+        CURLOPT_TIMEOUT => 1000,
+        CURLOPT_HTTPHEADER => array('Cookie: PHPSESSID='.$session_id),
     ];
 
     $ch = curl_init($url);
@@ -43,20 +51,24 @@ function get_zi ($attrs, $key, $rand, $server_name) {
     curl_close($ch);
 
     if ($errorNo !== CURLE_OK) {
-        echo "CURL ERROR : ".$errorNo."<br>";
+        return "CURL ERROR : ".$errorNo."<br>";
     }
 
     if ($info['http_code'] !== 200) {
-        echo "HTTP ERROR : ".$info['http_code']."<br>";
+        return "HTTP ERROR : ".$info['http_code']."<br>";
     }
 
     $jsonArray = json_decode($json, true);
     if(count($jsonArray) === 0) {
-        echo "CAUGHT ARRAY IS NULL<br>";
+        return "CAUGHT ARRAY IS NULL<br>";
     }
 
     $ret = [];
+    $ret['result'] = $JsonArray['result'];
     $ret['zi'] = $jsonArray['zi'];
+    $ret['session_id'] = $jsonArray['session_id'];
+    $ret['w_ij'] = $jsonArray['w_ij'];
 
     return $ret;
 }
+?>

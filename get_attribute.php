@@ -36,8 +36,9 @@ function get_attribute($server_name) {
     $ret['result'] = $jsonArray['result'];
     $ret['attributes'] = $jsonArray['attributes'];
     $ret['key'] = $jsonArray['key'];
+    $ret['session_id'] = $jsonArray['session_id'];
 
     return $ret;
 }
-$res = get_attribute("idp1.local");
+//$res = get_attribute("idp1.local");
 ?>

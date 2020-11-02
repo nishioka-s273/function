@@ -8,5 +8,3 @@ function encrypt($r, $mes, $Y, $a, $b, $p) {
     return $output[0];
     exit(0);
 }
-
-echo encrypt(3, 19, [1,2], 0, 1, 5);
