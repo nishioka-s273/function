@@ -10,6 +10,7 @@ function get_zi ($attrs, $key, $rand, $server_name, $session_id, $uid) {
     }
 
     $z = [];
+    $A = [];
     $i = 0;
     foreach ($attrs as $atr){
         // $atr の属性値を DB から取ってくる
@@ -20,9 +21,9 @@ function get_zi ($attrs, $key, $rand, $server_name, $session_id, $uid) {
         }
         else {
             $result_row = mysqli_fetch_row($result);
-            $at_value = $result_row[0];
+            $A[$i] = $result_row[0];
             $enc_r = encrypt($key['r'], $rand[$i], $key['Y'], $key['a'], $key['b'], $key['p']);
-            $z[$i] = $enc_r - $at_value;
+            $z[$i] = $enc_r - $A[$i];
             $i = $i+1;
         }
     }
@@ -64,10 +65,12 @@ function get_zi ($attrs, $key, $rand, $server_name, $session_id, $uid) {
     }
 
     $ret = [];
-    $ret['result'] = $JsonArray['result'];
-    $ret['zi'] = $jsonArray['zi'];
-    $ret['session_id'] = $jsonArray['session_id'];
+    $ret['result'] = $jsonArray['result'];
+    $ret['hash_function'] = $jsonArray['hash_function'];
+    $ret['algo'] = $jsonArray['algo'];
+    $ret['key'] = $jsonArray['key'];
     $ret['w_ij'] = $jsonArray['w_ij'];
+    $ret['A_i'] = $A;
 
     return $ret;
 }

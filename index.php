@@ -15,6 +15,8 @@
 <?php
 require "get_attribute.php";
 require "get_zi.php";
+require "get_ci.php";
+
 function return_word($data) {
     if ($data == 1) {
         $ats = get_attribute("idp1.local");
@@ -46,10 +48,20 @@ function return_word($data) {
 
         print_r($rand);
         echo "<br>";
-        $arr = get_zi($ats['attributes'], $ats['key'], $rand, "idp1.local", $session_id, "idp1_user1");
-        print_r($arr);
+        $wijs = get_zi($ats['attributes'], $ats['key'], $rand, "idp1.local", $session_id, "idp1_user1");
+        echo "result : ".$wijs['result']."<br>";
+        echo "hash_function : ".$wijs['hash_function']."<br>";
+        echo "algo : ".$wijs['algo']."<br>";
+        echo "key : ".$wijs['key']."<br>w_ij : ";
+        print_r($wijs['w_ij']);
+        echo "<br>attribute value : ";
+        print_r($wijs['A_i']);
 
-        return $arr['session_id'];
+        echo "<h3>get_ci</h3>";
+        $ci = get_ci($wijs['hash_function'], $wijs['algo'], $wijs['key'], $wijs['w_ij'], $wijs['A_i'],$rand);
+
+        print_r($ci);
+        return $ci[0];
     }
     else {
         return "error";
