@@ -28,5 +28,24 @@ The encryption key will be used to encrypt the assertion, embedded in simplesaml
 - uid (String): the user id of an user attempting to access to the SP (and be authenticated against the IdP).
 
 ### output (Associative array)
-- zi: the value got from the SP.
-- session_id: the session id used in these sequense.
+- result (String): 'OK' or 'NG' indicating the request to the SP has completed successfully or not.
+- hash_function (String): the hash function used in magic protocol.
+- algo (String): the algorithm used in the hash function.
+- key (String): the shared secret key used in the hash function.
+- w_ij (Array of int): the calculated values gotten from the SP.
+- A_i (Array of int) : the attribute values.
+
+## get_ci.php
+- calculate whether the attribute value is greater than the threshold of the SP or not.
+
+
+### input
+- hash_function (String): the hash function used in magic protocol.
+- algo (String): the algorithm used in the hash function.
+- key (String): the shared secret key used in the hash function.
+- wij (Array of int): the values gotten from the SP.
+- A (Array of int): the attribute values of the user.
+- rand (Array of int): the random values used in get_zi function.
+
+### output (Array)
+- ci (Array of int): the values of 1 or 0, indicating the attribute value is greater than the threshold value, or not.
