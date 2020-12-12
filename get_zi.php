@@ -1,5 +1,5 @@
 <?php
-require "crypt.php";
+require_once "crypt.php";
 include("data/db_login.php");
 
 // 財産比べプロトコルで用いる z_i を作成し，SP に渡して w_{ij} を得る
@@ -70,6 +70,8 @@ function get_zi ($attrs, $key, $rand, $server_name, $session_id, $uid) {
     $ret['algo'] = $jsonArray['algo'];
     $ret['key'] = $jsonArray['key'];
     $ret['w_ij'] = $jsonArray['w_ij'];
+    $ret['random'] = $jsonArray['random'];
+    $ret['session_id'] = $jsonArray['session_id'];
     $ret['A_i'] = $A;
 
     return $ret;
