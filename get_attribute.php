@@ -1,5 +1,5 @@
 <?php
-function get_attribute($server_name) {
+function get_attribute($sid, $server_name) {
     // IPアドレスで書かないとエラーになる
     $url = "http://10.229.71.229/api/attribute.php?"
     //$url = "http://sp1.local/api/attribute.php?"
@@ -8,6 +8,7 @@ function get_attribute($server_name) {
     $option = [
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT => 3,
+        CURLOPT_HTTPHEADER => array('Cookie: PHPSESSID='.$sid)
     ];
 
     $ch = curl_init($url);

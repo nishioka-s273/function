@@ -1,9 +1,10 @@
 <?php
-require_once "crypt.php";
+require_once "/var/www/function/crypt.php";
 include("data/db_login.php");
 
 // 財産比べプロトコルで用いる z_i を作成し，SP に渡して w_{ij} を得る
 function get_zi ($attrs, $key, $rand, $server_name, $session_id, $uid) {
+
     $connection = mysqli_connect($db_host, 'root', 'admin', 'simplesaml');
     if (!$connection){
         die ("[error1] Could not connect to the database: <br />". mysqli_connect_error());
@@ -23,7 +24,7 @@ function get_zi ($attrs, $key, $rand, $server_name, $session_id, $uid) {
             $result_row = mysqli_fetch_row($result);
             $A[$i] = $result_row[0];
             $enc_r = encrypt($key['r'], $rand[$i], $key['Y'], $key['a'], $key['b'], $key['p']);
-            $z[$i] = $enc_r - $A[$i];
+            $z[$i] =(int)$enc_r - $A[$i];
             $i = $i+1;
         }
     }
@@ -73,6 +74,7 @@ function get_zi ($attrs, $key, $rand, $server_name, $session_id, $uid) {
     $ret['random'] = $jsonArray['random'];
     $ret['session_id'] = $jsonArray['session_id'];
     $ret['A_i'] = $A;
+    $ret['zi'] = $z;
 
     return $ret;
 }

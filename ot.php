@@ -1,7 +1,7 @@
 <?php
 require_once "crypt.php";
 
-function obious_transfer ($key, $depth, $rand, $ci, $session_id, $server) {
+function oblivious_transfer ($key, $depth, $rand, $ci, $session_id, $server) {
     $i = 0;
 
     if ($depth !== count($ci)) {
@@ -34,8 +34,6 @@ function obious_transfer ($key, $depth, $rand, $ci, $session_id, $server) {
 
         $enc = encrypt($key['r'], $x, $key['Y'], $key['a'], $key['b'], $key['p']);
         $q = $enc + $q;
-        //echo "<br>q = ".$q;
-        //echo "<br>count = $i<br>";
 
         // SP問い合わせ
         $url = "http://10.229.71.229/api/cal_ot.php?"
@@ -73,7 +71,6 @@ function obious_transfer ($key, $depth, $rand, $ci, $session_id, $server) {
         }
         $ret = [];
         if ($jsonArray['result'] == 'OK') {
-            //echo "OK<br>";
             $ret['result'] = $jsonArray['result'];
             $ret['c'] = $jsonArray['c'];
             $nextnode = $ret['c'][$index] - $x;
